@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from wordtag.views import TagViewSet, WordViewSet
+from wordtag.views import TagViewSet, WordViewSet, SpellinBloxPullHandler
 
 router = routers.DefaultRouter()
 router.register(r'tags', TagViewSet)
@@ -25,5 +25,6 @@ router.register(r'words', WordViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('login', SpellinBloxPullHandler.run),
     path('api/', include(router.urls))
 ]
