@@ -296,6 +296,9 @@ class DomainLocker(LoginDomainLockedJsonHandler):
         data = json.loads(request.body)
         domain = data.get("domain", "")
         ret_data = {}
+        cls.logger.error("----------------------------------------------")
+        cls.logger.error(f"domain: {domain}")
+        cls.logger.error(f"mumain: {cls._lock_to_domain}")
         if domain == cls._lock_to_domain:
             try:
                 domainObj = Domain.objects.get(url=domain)
