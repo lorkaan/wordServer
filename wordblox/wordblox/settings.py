@@ -172,11 +172,6 @@ LOGGING = {
         'console': {
             'level': getEnviron('DJANGO_LOG_LEVEL', 'DEBUG'),
             'class': 'logging.StreamHandler',
-        },
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': '/app/logs/django/error.log',
         }
     },
     'loggers': {
@@ -185,12 +180,7 @@ LOGGING = {
             'level': getEnviron('DJANGO_LOG_LEVEL', 'DEBUG'),
             'propagate': False,
         },
-        'client': {
-            'handlers': ['console'],
-            'level': getEnviron('DJANGO_LOG_LEVEL', 'DEBUG'),
-            'propagate': False,
-        },
-        'spellinb': {
+        'wordtag': {
             'handlers': ['console'],
             'level': getEnviron('DJANGO_LOG_LEVEL', 'DEBUG'),
             'propagate': False,
