@@ -173,6 +173,16 @@ LOGGING = {
             'level': getEnviron('DJANGO_LOG_LEVEL', 'DEBUG'),
             'class': 'logging.StreamHandler',
         },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/home/logs/django/debug.log',
+        },
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': '/home/logs/django/error.log',
+        },
     },
     'loggers': {
         'django': {
