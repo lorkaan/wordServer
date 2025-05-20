@@ -18,7 +18,7 @@ class TagSerializer(AuthenticatedSerializer):
     domain = DomainSerializer(many=False, read_only=True)
 
     domain_id = serializers.PrimaryKeyRelatedField( # write
-        queryset=Tag.objects.all(), source='domain', write_only=True
+        queryset=Domain.objects.all(), source='domain', write_only=True
     )
 
     class Meta:
