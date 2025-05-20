@@ -1,10 +1,12 @@
 from rest_framework import viewsets
+from utils.create_spellinblox_wordtag_dict import SpellinBloxPushDataCrafter
 from .models import Word, Tag, Domain
 from .serializers import TagSerializer, WordSerializer
 from utils.fetch_word_data import ExternalServerFetchException, FetchController
 from django.http import HttpResponse, JsonResponse
 from utils.json_input_handler import LoginDomainLockedJsonHandler
 from utils.word_tag_data import TupleKeyCollection, SyncMethod
+from utils.session_auth import set_auth_token, verify_auth
 import json
 from enum import Enum
 import logging
@@ -272,16 +274,7 @@ class SyncHandler:
         else:
             raise TypeError(f"Expected TupleKeyCollections for parameters externalData and cachedData, instead got: {externalData.__class__}, {cachedData.__class__}") 
 
-class SpellinBloxPullHandler(LoginDomainLockedJsonHandler):
-    """
-        Handler for handling pull communication with the External SpellinBlox server.
-
-        This class handles the login for the SpellinBlox server, as well as creating the TupleKeyCollections used by
-        the Sync handler and starting the process.
-
-        The goal of this class is to provide a single endpoint for pulling data from SpellinBlox.
-        
-    """
+class SpellinBloxHandler(LoginDomainLockedJsonHandler):
 
     @classmethod
     def getAllCachedData(cls, domain):
@@ -310,6 +303,19 @@ class SpellinBloxPullHandler(LoginDomainLockedJsonHandler):
                         continue
                     cached_wordtags.add(tag, word, details)
             return cached_wordtags
+    
+
+class SpellinBloxPullHandler(SpellinBloxHandler):
+    """
+        Handler for handling pull communication with the External SpellinBlox server.
+
+        This class handles the login for the SpellinBlox server, as well as creating the TupleKeyCollections used by
+        the Sync handler and starting the process.
+
+        The goal of this class is to provide a single endpoint for pulling data from SpellinBlox.
+        
+    """
+
         
     @classmethod
     def getAllExternalData(cls, controller, domain):
@@ -381,6 +387,7 @@ class SpellinBloxPullHandler(LoginDomainLockedJsonHandler):
             err_msg = f"Authentication Failed, Error Unknown: {e}"
         finally:
             if auth_check:
+                set_auth_token(request)
                 external_wordtags = None
                 cached_wordtags = None
                 try:
@@ -414,10 +421,28 @@ class SpellinBloxPullHandler(LoginDomainLockedJsonHandler):
                 controller.quit()
                 return HttpResponse(err_msg, status=403)
             
-class SpellinBloxPushHandler(LoginDomainLockedJsonHandler):
+class SpellinBloxPushHandler(SpellinBloxHandler):
     """
         This is the class for handling the push communication for the external SpellinBlox server
     """
 
+    spellinblox_push_url = "https://spellinblox.com/api/save/"
+
     # TO DO
-    pass
+    @classmethod
+    def post_input(cls, request):
+        if verify_auth(request):
+            data = json.loads(request.body)
+            domain = data.get("domain", "")
+            try:
+                cached_wordtags = cls.getAllCachedData(domain)
+            except DomainError as e:
+                cls.logger.error(f"Domain Error with Cached Data: {e}")
+                return HttpResponse(f"FetchController failed: {e}", status=400)
+            try:
+                SpellinBloxPushDataCrafter.pushCacheToServer(cached_wordtags, domain)
+            except Exception as e:
+                return HttpResponse(f"{e}", status=405)
+            return HttpResponse("Attempted to the Sync", status=200)
+        else:
+            return HttpResponse("Must be Authenticated", status=403)

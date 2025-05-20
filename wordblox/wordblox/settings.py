@@ -57,6 +57,9 @@ else:
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
 
+SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Store in DB
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 1200 # 20 minute session data live time
 
 
 # Application definition

@@ -1,7 +1,7 @@
-from rest_framework import serializers
 from .models import Tag, Word, Domain
+from utils.auth_serializer import AuthenticatedSerializer
 
-class WordSerializer(serializers.ModelSerializer):
+class WordSerializer(AuthenticatedSerializer):
     class Meta:
         model = Word
         fields = ['id', 'text', 'details']
@@ -12,14 +12,14 @@ class WordSerializer(serializers.ModelSerializer):
         if self.instance: # will not exist on creation
             self.fields['text'].ready_only = True
 
-class TagSerializer(serializers.ModelSerializer):
+class TagSerializer(AuthenticatedSerializer):
     words = WordSerializer(many=True, read_only=True)
 
     class Meta:
         model = Tag
         fields = ['id', 'text', 'words']
 
-class DomainSerializer(serializers.ModelSerializer):
+class DomainSerializer(AuthenticatedSerializer):
     """
         Serializer controlling domains in the current system. There should never be a write
         function from a user applied to this data.
