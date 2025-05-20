@@ -60,7 +60,7 @@ class TupleKeyCollection:
         iterator = []
         for key, val in self.tag_word_details.items():
             tag, word = self.__class__.separate(key)
-            iterator.push((tag, word, val))
+            iterator.append((tag, word, val))
         return iterator
 
     def add(self, tag: str, word: str, details: str = ""):
