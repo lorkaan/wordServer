@@ -96,7 +96,7 @@ class SyncHandler:
 
     @classmethod
     def isValidSyncMethod(cls, syncMethod: SyncMethod):
-        return syncMethod in [elem.value for elem in SyncMethod]
+        return syncMethod in SyncMethod
     
     @classmethod
     def sanitizeSyncMethod(cls, syncMethod: SyncMethod):
@@ -107,7 +107,7 @@ class SyncHandler:
         
     @classmethod
     def isValidSyncControl(cls, syncControl: SyncControl):
-        return syncControl in [elem.value for elem in SyncControl]
+        return syncControl in SyncControl
     
     @classmethod
     def sanitizeSyncControl(cls, syncControl: SyncControl):
@@ -118,7 +118,7 @@ class SyncHandler:
 
     @classmethod
     def isValidSyncPriority(cls, syncPriority: CollectionPriority):
-        return syncPriority in [elem.value for elem in CollectionPriority]
+        return syncPriority in CollectionPriority
     
     @classmethod
     def sanitizeSyncPriority(cls, syncPriority: CollectionPriority):
