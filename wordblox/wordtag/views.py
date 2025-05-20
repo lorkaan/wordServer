@@ -7,6 +7,7 @@ from utils.json_input_handler import LoginDomainLockedJsonHandler
 from utils.word_tag_data import TupleKeyCollection, SyncMethod
 import json
 from enum import Enum
+import logging
 
 class SyncError(Exception):
 
@@ -58,6 +59,10 @@ class SyncHandler:
 
         Currently uses 3 settings to control how the sync is applied.
     """
+
+    # ----- Logger Definition for debugging -----
+
+    logger = logging.getLogger(__name__)
 
     # ----- Default values for the Sync Settings -----
 
