@@ -28,6 +28,9 @@ class FetchController:
     DATA_URL = "https://spellinblox.com/api/load/"
     
 
+    SAVE_URL = "https://spellinblox.com/api/save/"
+    
+
     @classmethod
     def isUsernameValid(cls, username: str):
         """
@@ -107,6 +110,17 @@ class FetchController:
             "X-CSRFToken": csrftoken2
         }
         data_response = self.session.post(self.__class__.DATA_URL, headers=data_headers, json=data_payload)
+        if not data_response.status_code == 200:
+            raise ExternalServerFetchException("ERROR: Data could not be fetched", data_response.status_code)
+        return data_response.json()
+    
+    def sendData(self, data):
+        csrftoken2 = self.session.cookies.get('csrftoken')
+        data_headers = {
+            'Content-Type': "application/json",
+            "X-CSRFToken": csrftoken2
+        }
+        data_response = self.session.post(self.__class__.SAVE_URL, headers=data_headers, json=data)
         if not data_response.status_code == 200:
             raise ExternalServerFetchException("ERROR: Data could not be fetched", data_response.status_code)
         return data_response.json()

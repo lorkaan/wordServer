@@ -453,10 +453,10 @@ class SpellinBloxPullHandler(SpellinBloxHandler):
                     external_wordtags = cls.getAllExternalData(controller, domain)
                 except TypeError as e:
                     cls.logger.error(f"FetchController failed: {e}")
-                    return HttpResponse(f"FetchController failed: {e}", status=500)
+                    #return HttpResponse(f"FetchController failed: {e}", status=500)
                 except DomainError as e:
                     cls.logger.error(f"Domain Error with External Data: {e}")
-                    return HttpResponse(f"FetchController failed: {e}", status=400)
+                    #return HttpResponse(f"FetchController failed: {e}", status=400)
                 finally:
                     controller.quit()
                 try:
@@ -485,23 +485,46 @@ class SpellinBloxPushHandler(SpellinBloxHandler):
         This is the class for handling the push communication for the external SpellinBlox server
     """
 
-    spellinblox_push_url = "https://spellinblox.com/api/save/"
-
     # TO DO
     @classmethod
     def post_input(cls, request):
         if verify_auth(request):
             data = json.loads(request.body)
             domain = data.get("domain", "")
+            username = data.get("username", "")
+            password = data.get("password", "")
+            controller = FetchController()
+            auth_check = False
+            err_msg = "Unknown Error"
             try:
-                cached_wordtags = cls.getAllCachedData(domain)
-            except DomainError as e:
-                cls.logger.error(f"Domain Error with Cached Data: {e}")
-                return HttpResponse(f"FetchController failed: {e}", status=400)
-            try:
-                SpellinBloxPushDataCrafter.pushCacheToServer(cached_wordtags, domain)
+                controller.auth(username, password)
+                auth_check = True
+            except ExternalServerFetchException as e:
+                auth_check = False # Just in case and for clarity
+                cls.logger.error(f"Authentication Error: {e}")
+                err_msg = f"Authentication Error: {e}"
             except Exception as e:
-                return HttpResponse(f"{e}", status=405)
-            return HttpResponse("Attempted to the Sync", status=200)
-        else:
-            return HttpResponse("Must be Authenticated", status=403)
+                auth_check = False # Just in case and for clarity
+                cls.logger.error(f"Authentication Failed, Error Unknown {e}")
+                err_msg = f"Authentication Failed, Error Unknown: {e}"
+            finally:
+                if auth_check:
+                    try:
+                        cached_wordtags = cls.getAllCachedData(domain)
+                    except DomainError as e:
+                        cls.logger.error(f"Domain Error with Cached Data: {e}")
+                        return HttpResponse(f"Fetching data from cache failed: {e}", status=400)
+                    data_packet = SpellinBloxPushDataCrafter.pushCacheToServer(cached_wordtags, domain)
+                    success_flag = True
+                    try:
+                        json_return = controller.sendData(data_packet)
+                    except Exception as e:
+                        err_msg = f"{e}"
+                        success_flag = False
+                    finally:
+                        controller.quit()
+                    if not success_flag:
+                        return HttpResponse(err_msg, status=500)
+                    return JsonResponse(json_return)
+                else:
+                    return HttpResponse("Must be Authenticated", status=403)
