@@ -358,6 +358,7 @@ class SpellinBloxPullHandler(LoginDomainLockedJsonHandler):
         controller = FetchController()
         auth_check = False
         err_msg = "Unknown Error"
+        sync_err_msg = ""
         try:
             controller.auth(username, password)
             auth_check = True
@@ -392,10 +393,11 @@ class SpellinBloxPullHandler(LoginDomainLockedJsonHandler):
                 try:
                     SyncHandler.syncExternalAndCached(external_wordtags, cached_wordtags, domain)
                     syncCompleted = True
-                except:
+                except Exception as e:
                     syncCompleted = False
+                    sync_err_msg = f"{e}"
                 finally:
-                    return JsonResponse({'syncCompleted': syncCompleted})
+                    return JsonResponse({'syncCompleted': syncCompleted, 'syncErr': sync_err_msg})
             else:
                 # Do something is authentication failed
                 controller.quit()
