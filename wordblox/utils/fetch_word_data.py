@@ -106,6 +106,12 @@ class FetchController:
         if not data_response.status_code == 200:
             raise ExternalServerFetchException("ERROR: Data could not be fetched", data_response.status_code)
         return data_response.json()
+    
+    def quit(self):
+        self.session.close()
+
+    def __del__(self):
+        self.quit()
 
 """
     ----- Every thing under this is depreciated -----

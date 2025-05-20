@@ -134,11 +134,5 @@ class TupleKeyCollection:
         else:
             return False
         
-    def quit(self):
-        self.session.close()
-
-    def __del__(self):
-        self.quit()
-        
 
     
