@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from utils.create_spellinblox_wordtag_dict import SpellinBloxPushDataCrafter
 from .models import Word, Tag, Domain
-from .serializers import TagSerializer, WordSerializer
+from .serializers import DomainSerializer, TagSerializer, WordSerializer
 from utils.fetch_word_data import ExternalServerFetchException, FetchController
 from django.http import HttpResponse, JsonResponse
 from utils.json_input_handler import LoginDomainLockedJsonHandler
@@ -23,6 +23,11 @@ class CollectionPriority(Enum):
 class SyncControl(Enum):
     MERGE = 0   # This refers to merging the rows that do not exist in both Cached and External
     DELETE = 1  # This refers to the completely overwritting the database based on CollectionPriority
+
+class DomainViewSet(viewsets.ModelViewSet):
+    queryset = Domain.object.all()
+    serializer_class = DomainSerializer
+    lookup_field = 'url'
 
 # Create your views here.
 class TagViewSet(viewsets.ModelViewSet):
@@ -273,6 +278,29 @@ class SyncHandler:
                 raise e
         else:
             raise TypeError(f"Expected TupleKeyCollections for parameters externalData and cachedData, instead got: {externalData.__class__}, {cachedData.__class__}") 
+
+
+class DomainLocker(LoginDomainLockedJsonHandler):
+
+    domain_id_key = "domain_id"
+
+    _lock_to_domain = "https://www-spellinblox-info.filesusr.com/"
+
+    @classmethod
+    def post_input(cls, request):
+        data = json.loads(request.body)
+        domain = data.get("domain", "")
+        ret_data = {}
+        if domain == cls._lock_to_domain:
+            try:
+                domainObj = Domain.objects.get(url=domain)
+                ret_data[cls.domain_id_key] = domainObj.id
+            except Domain.DoesNotExist:
+                ret_data[cls.domain_id_key] = -1
+            finally:
+                return JsonResponse(ret_data)
+        else:
+            return HttpResponse("You do not have acces to that domain.", status=403)
 
 class SpellinBloxHandler(LoginDomainLockedJsonHandler):
 

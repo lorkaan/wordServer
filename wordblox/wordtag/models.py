@@ -9,7 +9,7 @@ class TextAbstractModel(models.Model):
         abstract = True
 
 class Domain(models.Model): # Questionable, consider before migrating
-    url = models.URLField()
+    url = models.URLField(unique=True)
 
 class Tag(TextAbstractModel):
     domain = models.ForeignKey(Domain, related_name="tags", on_delete=models.CASCADE)
