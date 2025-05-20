@@ -1,4 +1,5 @@
 import requests
+import logging
 
 class ExternalServerFetchException(Exception):
     def __init__(self, message: str, code: int):
@@ -16,6 +17,8 @@ class FetchController:
         Using this class, this server can essentially act as a login proxy.
 
     """
+
+    logger = logging.getLogger(__name__) # Debuggin
 
     # Hard code for now. Limit only to domains that I have permission to do this to.
     LOGIN_URL = "https://spellinblox.com/accounts/login/"
@@ -80,7 +83,7 @@ class FetchController:
             headers['Referer'] = LOGIN_URL
 
         login_response = self.session.post(self.__class__.LOGIN_URL, data=login_payload, headers=headers)
-
+        cls.logger.error(login_response.status_code)
         if login_response.status_code not in [200, 302]:
             raise ExternalServerFetchException("ERROR: Login Failed", login_response.status_code)
         
