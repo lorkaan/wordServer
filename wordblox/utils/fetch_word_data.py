@@ -84,7 +84,8 @@ class FetchController:
 
         login_response = self.session.post(self.__class__.LOGIN_URL, data=login_payload, headers=headers)
         self.__class__.logger.error(login_response.status_code)
-        if login_response.status_code not in [302]: # 200 is a bad code in this instance cause it is giving the login page again
+        self.__class__.logger.error(f"URL is: {login_response.url} and {login_response.url == LOGIN_URL}")
+        if login_response.status_code not in [200, 302] or login_response.url == LOGIN_URL: 
             raise ExternalServerFetchException("ERROR: Login Failed", login_response.status_code)
         
     def getData(self, domain:str):
