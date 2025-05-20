@@ -317,6 +317,11 @@ class AuthChecker(LoginDomainLockedJsonHandler):
         pass
 
     @classmethod
+    def get_input(cls, request):
+        cls._extra_steps(request)
+        return JsonResponse({'auth': verify_auth(request)})
+    
+    @classmethod
     def post_input(cls, request):
         cls._extra_steps(request)
         return JsonResponse({'auth': verify_auth(request)})
