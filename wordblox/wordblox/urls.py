@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework import routers
 from wordtag.views import TagViewSet, WordViewSet, SpellinBloxPullHandler
-from utils.tokens import get_crsf_token
+from utils.tokens import get_csrf_token
 
 router = routers.DefaultRouter()
 router.register(r'tags', TagViewSet)
@@ -26,7 +26,7 @@ router.register(r'words', WordViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('crsf-token', get_crsf_token),
+    path('csrf-token', get_csrf_token),
     path('login', SpellinBloxPullHandler.run),
     path('api/', include(router.urls))
 ]

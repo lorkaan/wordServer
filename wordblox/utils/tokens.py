@@ -9,7 +9,7 @@
     are generated here as there is not a need at present for other tokens.
 """
 from django.http import JsonResponse
-from django.middleware.crsf import get_token
+from django.middleware.csrf import get_token
 
-def get_crsf_token(request):
-    return JsonResponse({'crsfToken': get_token(request)})
+def get_csrf_token(request):
+    return JsonResponse({'csrfToken': get_token(request)})
