@@ -139,7 +139,8 @@ class SyncHandler:
         """
         if not cls.isValidDomain(domain):
             raise DomainError(f"Can not process the given domain: {domain}")
-        if isinstance(collection, TupleKeyCollection):
+        #if isinstance(collection, TupleKeyCollection):
+        if collection is TupleKeyCollection:
             for tup in iter(collection):
                 if len(tup) == 3:
                     tag, word, _ = tup
@@ -176,7 +177,8 @@ class SyncHandler:
         """
         if not cls.isValidDomain(domain):
             raise DomainError(f"Can not process the given domain: {domain}")
-        if isinstance(collection, TupleKeyCollection):
+        #if isinstance(collection, TupleKeyCollection):
+        if collection is TupleKeyCollection:
             for tup in iter(collection):
                 if len(tup) == 3:
                     tag, word, details = tup
@@ -234,7 +236,8 @@ class SyncHandler:
         """
         if not cls.isValidDomain(domain):
             raise DomainError(f"Can not process the given domain: {domain}")
-        if isinstance(externalData, TupleKeyCollection) and isinstance(cachedData, TupleKeyCollection):
+        #if isinstance(externalData, TupleKeyCollection) and isinstance(cachedData, TupleKeyCollection):
+        if externalData is TupleKeyCollection and cachedData is TupleKeyCollection:
             syncMethod = cls.sanitizeSyncMethod(syncMethod)
             syncPriority = cls.sanitizeSyncPriority(syncPriority)
             syncControl = cls.sanitizeSyncControl(syncControl)
@@ -309,7 +312,8 @@ class SpellinBloxPullHandler(LoginDomainLockedJsonHandler):
 
             @return {TupleKeyCollection}    The collection representing the data retreived.
         """
-        if isinstance(controller, FetchController):
+        #if isinstance(controller, FetchController):
+        if controller is FetchController:
             # Change this to be more specific errors
             raise TypeError(f"Controller expected to be a FetchController, instead got: {type(controller)}")
         if type(domain) != str:
