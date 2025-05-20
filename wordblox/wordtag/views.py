@@ -202,7 +202,8 @@ class SyncHandler:
                         if word.details != sanitized_details:
                             wordtag.details = sanitized_details
                             wordtag.save()
-                    except Word.DoesNotExist as e:
+                    except Word.DoesNotExist:
+                        tagObj = None
                         try:
                             tagObj = Tag.objects.get(text=tag, domain__url=domain)
                         except Tag.DoesNotExist:
@@ -213,8 +214,9 @@ class SyncHandler:
                             tagObj = Tag(text=tag, domain=domainObj)
                             tagObj.save()
                         finally:
-                            word = Word(text=word, tag=tagObj, details=sanitized_details)
-                            word.save()
+                            if tagObj != None:
+                                word = Word(text=word, tag=tagObj, details=sanitized_details)
+                                word.save()
         else:
             raise TypeError(f"Expected a TupleKeyCollection, instead got: {collection.__class__}")
 
