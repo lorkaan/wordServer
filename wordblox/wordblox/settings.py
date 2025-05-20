@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from utils.env_utils import getEnviron, getEnvironArray
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,9 +24,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-)@i(!hr0lsantm77$7vf#t3+nmr32e)u#tv80zf%(&+-mt^+95'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+debug_env = getEnviron("DEBUG_MODE", "1") 
 
-ALLOWED_HOSTS = []
+if type(debug_env) == str and debug_env == "1":
+    DEBUG = True
+else:
+    DEBUG = False
+
+domains = getEnvironArray('DOMAINS')
+hosts = getEnvironArray('HOSTS')
+
+if DEBUG:
+    hosts.extend(["localhost", "backend"])
+    csrfHosts = ["http://127.0.0.1"]
+    csrfPrepend = "http"
+else:
+    hosts.extend(["backend"])
+    csrfHosts = []
+    csrfPrepend = "https"
+
+hosts.extend(domains)
+csrfHosts.extend(list(map(lambda x: csrfPrepend + "://" + x, hosts)))
+
+ALLOWED_HOSTS = hosts
+CSRF_TRUSTED_ORIGINS = csrfHosts
 
 
 # Application definition
@@ -115,9 +137,46 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/django_static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+STATIC_ROOT = BASE_DIR / 'django_static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default':{
+            'format': '[DJANGO] %(levelname)s %(asctime)s %(module)s %(name)s.%(funcName)s:%(lineno)s: %(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': getEnviron('DJANGO_LOG_LEVEL', 'DEBUG'),
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handers': ['console'],
+            'level': getEnviron('DJANGO_LOG_LEVEL', 'DEBUG'),
+            'propagate': False,
+        },
+        'client': {
+            'handlers': ['console'],
+            'level': getEnviron('DJANGO_LOG_LEVEL', 'DEBUG'),
+            'propagate': False,
+        },
+        'spellinb': {
+            'handlers': ['console'],
+            'level': getEnviron('DJANGO_LOG_LEVEL', 'DEBUG'),
+            'propagate': False,
+        }
+    }
+}
