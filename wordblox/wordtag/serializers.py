@@ -1,23 +1,35 @@
 from .models import Tag, Word, Domain
 from utils.auth_serializer import AuthenticatedSerializer
+from rest_framework import serializers
+
+class TagSerializer(AuthenticatedSerializer):
+
+    class Meta:
+        model = Tag
+        fields = ['id', 'text']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance:
+            self.fields['text'].read_only = True
 
 class WordSerializer(AuthenticatedSerializer):
+
+    tag = TagSerializer(many=False, read_only=True)
+
+    tag_id = serializers.PrimaryKeyRelatedField( # write
+        queryset=Tag.objects.all(), source='tag', write_only=True
+    )
+
     class Meta:
         model = Word
-        fields = ['id', 'text', 'details']
-        read_only_fields = ['id']
+        fields = ['id', 'text', 'details', "tag", "tag_id"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance: # will not exist on creation
             self.fields['text'].ready_only = True
 
-class TagSerializer(AuthenticatedSerializer):
-    words = WordSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Tag
-        fields = ['id', 'text', 'words']
 
 class DomainSerializer(AuthenticatedSerializer):
     """
