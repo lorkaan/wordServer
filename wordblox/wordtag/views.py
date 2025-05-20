@@ -395,7 +395,9 @@ class SpellinBloxPullHandler(LoginDomainLockedJsonHandler):
                     syncCompleted = True
                 except Exception as e:
                     syncCompleted = False
-                    sync_err_msg = f"{e}"
+                    import traceback
+                    sync_err_msg = f"{e}:\t(Line Number: {traceback.extract_tb(e.__traceback__)[-1][1]})"
+
                 finally:
                     return JsonResponse({'syncCompleted': syncCompleted, 'syncErr': sync_err_msg})
             else:
