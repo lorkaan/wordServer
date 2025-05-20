@@ -236,8 +236,8 @@ class SyncHandler:
         """
         if not cls.isValidDomain(domain):
             raise DomainError(f"Can not process the given domain: {domain}")
-        #if isinstance(externalData, TupleKeyCollection) and isinstance(cachedData, TupleKeyCollection):
-        if externalData is TupleKeyCollection and cachedData is TupleKeyCollection:
+        if isinstance(externalData, TupleKeyCollection) and isinstance(cachedData, TupleKeyCollection):
+        #if externalData is TupleKeyCollection and cachedData is TupleKeyCollection:
             syncMethod = cls.sanitizeSyncMethod(syncMethod)
             syncPriority = cls.sanitizeSyncPriority(syncPriority)
             syncControl = cls.sanitizeSyncControl(syncControl)
