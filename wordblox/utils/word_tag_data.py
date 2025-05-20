@@ -82,8 +82,8 @@ class TupleKeyCollection:
                 new_collection = Items not in this collection, but are in the passed collection
                 both_collection = Items that are in both collections
         """
-        #if isinstance(other_collection, TupleKeyCollection):
-        if other_collection is TupleKeyCollection:
+        if isinstance(other_collection, TupleKeyCollection):
+        #if other_collection is TupleKeyCollection:
             new_collection = TupleKeyCollection() # in other_collection, but not in self.tag_word_details dictionary
             old_collection = TupleKeyCollection() # in self.tag_word_details dictionary but not in other_collection
             both_collection = TupleKeyCollection() # in both other_collection and self.tag_word_details
