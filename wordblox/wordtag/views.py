@@ -13,11 +13,11 @@ class SyncError(Exception):
     def __init__(self, message):
         super().__init__(message)
 
-class CollectionPriority:
+class CollectionPriority(Enum):
     CACHED = 0
     EXTERNAL = 1
 
-class SyncControl:
+class SyncControl(Enum):
     MERGE = 0   # This refers to merging the rows that do not exist in both Cached and External
     DELETE = 1  # This refers to the completely overwritting the database based on CollectionPriority
 
