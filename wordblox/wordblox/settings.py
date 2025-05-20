@@ -50,6 +50,14 @@ csrfHosts.extend(list(map(lambda x: csrfPrepend + "://" + x, hosts)))
 ALLOWED_HOSTS = hosts
 CSRF_TRUSTED_ORIGINS = csrfHosts
 
+if DEBUG:
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+else:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+
+
 
 # Application definition
 

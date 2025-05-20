@@ -15,9 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from rest_framework import routers
 from wordtag.views import TagViewSet, WordViewSet, SpellinBloxPullHandler
+from utils.tokens import get_crsf_token
 
 router = routers.DefaultRouter()
 router.register(r'tags', TagViewSet)
@@ -25,6 +26,7 @@ router.register(r'words', WordViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('crsf-token', get_crsf_token),
     path('login', SpellinBloxPullHandler.run),
     path('api/', include(router.urls))
 ]

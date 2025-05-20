@@ -256,6 +256,7 @@ class SyncHandler:
                 # This needs to change to perform it on the models I think
             except Exception as e:
                 cls.logger.error(e)
+                raise e
         else:
             raise TypeError(f"Expected TupleKeyCollections for parameters externalData and cachedData, instead got: {externalData.__class__}, {cachedData.__class__}") 
 
@@ -352,15 +353,18 @@ class SpellinBloxPullHandler(LoginDomainLockedJsonHandler):
         password = data.get("password", "")
         controller = FetchController()
         auth_check = False
+        err_msg = "Unknown Error"
         try:
             controller.auth(username, password)
             auth_check = True
         except ExternalServerFetchException as e:
             auth_check = False # Just in case and for clarity
             cls.logger.error(f"Authentication Error: {e}")
+            err_msg = f"Authentication Error: {e}"
         except Exception as e:
             auth_check = False # Just in case and for clarity
-            cls.logger.error(f"Unknown Error: {e}")
+            cls.logger.error(f"Authentication Failed, Error Unknown {e}")
+            err_msg = f"Authentication Failed, Error Unknown: {e}"
         finally:
             if auth_check:
                 external_wordtags = None
@@ -369,19 +373,29 @@ class SpellinBloxPullHandler(LoginDomainLockedJsonHandler):
                     external_wordtags = cls.getAllExternalData(controller, domain)
                 except TypeError as e:
                     cls.logger.error(f"FetchController failed: {e}")
+                    return HttpResponse(f"FetchController failed: {e}", status=500)
                 except DomainError as e:
                     cls.logger.error(f"Domain Error with External Data: {e}")
+                    return HttpResponse(f"FetchController failed: {e}", status=400)
                 finally:
                     controller.quit()
                 try:
                     cached_wordtags = cls.getAllCachedData(domain)
                 except DomainError as e:
                     cls.logger.error(f"Domain Error with Cached Data: {e}")
-                cls.syncExternalAndCached(external_wordtags, cached_wordtags, domain)
+                    return HttpResponse(f"FetchController failed: {e}", status=400)
+                syncCompleted = False
+                try:
+                    SyncHandler.syncExternalAndCached(external_wordtags, cached_wordtags, domain)
+                    syncCompleted = True
+                except:
+                    syncCompleted = False
+                finally:
+                    return JsonResponse({'syncCompleted': syncCompleted})
             else:
                 # Do something is authentication failed
                 controller.quit()
-                return HttpResponse(status=403)
+                return HttpResponse(err_msg, status=403)
             
 class SpellinBloxPushHandler(LoginDomainLockedJsonHandler):
     """
