@@ -146,7 +146,7 @@ class SyncHandler:
             raise DomainError(f"Can not process the given domain: {domain}")
         #if isinstance(collection, TupleKeyCollection):
         if collection is TupleKeyCollection:
-            for tup in iter(collection):
+            for tup in collection.toList():
                 if len(tup) == 3:
                     tag, word, _ = tup
                 elif len(tup) == 2:
@@ -184,7 +184,7 @@ class SyncHandler:
             raise DomainError(f"Can not process the given domain: {domain}")
         if isinstance(collection, TupleKeyCollection):
         #if collection is TupleKeyCollection:
-            for tup in iter(collection):
+            for tup in collection.toList():
                 if len(tup) == 3:
                     tag, word, details = tup
                 elif len(tup) == 2:

@@ -56,12 +56,15 @@ class TupleKeyCollection:
     def __init__(self):
         self.tag_word_details = {}
 
-    def __iter__(self):
-        iterator = []
-        for key, val in self.tag_word_details.items():
-            tag, word = self.__class__.separate(key)
-            iterator.append((tag, word, val))
-        return iterator
+    def toList(self):
+        """
+            Using a toList function to create tuple lists that can be easily iterated on
+        """
+        l = []
+        for k, v in self.tag_word_details.items():
+            key1, key2 = self.__class__.separate(k)
+            l.append((key1, key2, v))
+        return l
 
     def add(self, tag: str, word: str, details: str = ""):
         key = self.__class__.combine(tag, word)
@@ -87,7 +90,7 @@ class TupleKeyCollection:
             new_collection = TupleKeyCollection() # in other_collection, but not in self.tag_word_details dictionary
             old_collection = TupleKeyCollection() # in self.tag_word_details dictionary but not in other_collection
             both_collection = TupleKeyCollection() # in both other_collection and self.tag_word_details
-            for tag, word, details in iter(other_collection):
+            for tag, word, details in other_collection.toList():
                 cur_val = self.get(tag, word)
                 if cur_val == None:
                     new_collection.add(tag, word, details)
