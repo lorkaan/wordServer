@@ -7,3 +7,5 @@ class AuthenticatedSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         if not request or not verify_auth(request):
             raise serializers.ValidationError("User must be authenticated")
+        else:
+            return data
