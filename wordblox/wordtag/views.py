@@ -25,9 +25,11 @@ class SyncControl(Enum):
     DELETE = 1  # This refers to the completely overwritting the database based on CollectionPriority
 
 class DomainViewSet(viewsets.ModelViewSet):
-    queryset = Domain.object.all()
+    """
+        Disabled fully to prevent any cross domain access at all for this demo
+    """
+    queryset = Domain.objects.all()
     serializer_class = DomainSerializer
-    lookup_field = 'url'
 
 # Create your views here.
 class TagViewSet(viewsets.ModelViewSet):
@@ -281,6 +283,9 @@ class SyncHandler:
 
 
 class DomainLocker(LoginDomainLockedJsonHandler):
+    """
+        This is here to restrict testing to be done only on data that lives under this safe test domain.
+    """
 
     domain_id_key = "domain_id"
 
