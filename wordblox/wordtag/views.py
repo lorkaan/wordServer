@@ -6,7 +6,7 @@ from utils.fetch_word_data import ExternalServerFetchException, FetchController
 from django.http import HttpResponse, JsonResponse
 from utils.json_input_handler import LoginDomainLockedJsonHandler
 from utils.word_tag_data import TupleKeyCollection, SyncMethod
-from utils.session_auth import set_auth_token, verify_auth
+from utils.session_auth import clear_session, set_auth_token, verify_auth
 import json
 from enum import Enum
 import logging
@@ -309,6 +309,24 @@ class DomainLocker(LoginDomainLockedJsonHandler):
                 return JsonResponse(ret_data)
         else:
             return HttpResponse("You do not have acces to that domain.", status=403)
+
+class AuthChecker(LoginDomainLockedJsonHandler):
+
+    @classmethod
+    def _extra_steps(cls, request):
+        pass
+
+    @classmethod
+    def post_input(cls, request):
+        cls._extra_steps(request)
+        return JsonResponse({'auth': verify_auth(request)})
+
+
+class LogoutHandler(AuthChecker):
+
+    @classmethod
+    def _extra_steps(cls, request):
+        clear_session(request)
 
 class SpellinBloxHandler(LoginDomainLockedJsonHandler):
 
