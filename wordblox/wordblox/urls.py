@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from wordtag.views import TagViewSet, WordViewSet, SpellinBloxPullHandler, DomainLocker, LogoutHandler, AuthChecker
+from wordtag.views import TagViewSet, WordViewSet, SpellinBloxPullHandler, DomainLocker, LogoutHandler, AuthChecker, SpellinBloxPushHandler
 from utils.tokens import get_csrf_token
 
 router = routers.DefaultRouter()
@@ -31,5 +31,6 @@ urlpatterns = [
     path('get_domain_id', DomainLocker.run),
     path('logout', LogoutHandler.run),
     path('is_auth', AuthChecker.run),
+    path('push_data', SpellinBloxPushHandler.run),
     path('api/', include(router.urls))
 ]
