@@ -17,7 +17,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = ['id', 'text', 'books']
+        fields = ['id', 'text', 'words']
 
 class DomainSerializer(serializers.ModelSerializer):
     """
