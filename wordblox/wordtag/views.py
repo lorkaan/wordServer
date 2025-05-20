@@ -177,8 +177,8 @@ class SyncHandler:
         """
         if not cls.isValidDomain(domain):
             raise DomainError(f"Can not process the given domain: {domain}")
-        #if isinstance(collection, TupleKeyCollection):
-        if collection is TupleKeyCollection:
+        if isinstance(collection, TupleKeyCollection):
+        #if collection is TupleKeyCollection:
             for tup in iter(collection):
                 if len(tup) == 3:
                     tag, word, details = tup
