@@ -210,9 +210,11 @@ class SyncHandler:
                             try:
                                 domainObj = Domain.objects.get(url=domain)
                             except Domain.DoesNotExist:
-                                raise SyncError(f"Can not find a Domain object with url: {domain}")
-                            tagObj = Tag(text=tag, domain=domainObj)
-                            tagObj.save()
+                                domainObj = Domain(url=domain)
+                                domainObj.save()
+                            finally:
+                                tagObj = Tag(text=tag, domain=domainObj)
+                                tagObj.save()
                         finally:
                             if tagObj != None:
                                 word = Word(text=word, tag=tagObj, details=sanitized_details)
